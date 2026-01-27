@@ -64,7 +64,7 @@ function renderAlbum() {
 
     document.getElementById('page-title').textContent = album.title;
     
-    // Исправленная кнопка редактирования
+    // Ссылка на редактирование
     const editBtn = document.getElementById('edit-album-btn');
     if (editBtn) editBtn.href = `edit-album.html?id=${albumId}`;
 
@@ -185,6 +185,12 @@ function openTrackModal(trackId) {
             <div class="score-row"><span class="score-label">Репитабельность</span><span class="score-value" style="color: ${getScoreColor(track.replayability)}">${track.replayability}</span></div>
         </div>
         ${track.notes ? `<div class="modal-notes"><strong>Заметки:</strong> ${track.notes}</div>` : ''}
+        ${(track.spotify_url || track.youtube_url) ? `
+        <div class="modal-links">
+            ${track.spotify_url ? `<a href="${track.spotify_url}" target="_blank" class="link-btn spotify">Spotify</a>` : ''}
+            ${track.youtube_url ? `<a href="${track.youtube_url}" target="_blank" class="link-btn youtube">YouTube</a>` : ''}
+        </div>
+        ` : ''}
         <div class="modal-actions-row">
             <a href="edit-track.html?id=${track.id}" class="btn-edit">✏️ Редактировать</a>
             <button class="btn-delete" onclick="deleteTrack('${track.id}')">🗑️</button>
@@ -194,8 +200,74 @@ function openTrackModal(trackId) {
     modal.classList.remove('hidden');
 }
 
-// Функции модалок и удаление...
-// (Остальной код остаётся стандартным, главное - renderAlbum и openTrackModal выше)
+function openStatsModal() {
+    if (albumTracks.length === 0) {
+        alert('Нет треков для статистики');
+        return;
+    }
+
+    const modal = document.getElementById('stats-modal');
+    const body = document.getElementById('stats-modal-body');
+
+    const sorted = [...albumTracks].sort((a, b) => b.total_score - a.total_score);
+    const best = sorted[0];
+    const worst = sorted[sorted.length - 1];
+    const avgScore = (albumTracks.reduce((sum, t) => sum + t.total_score, 0) / albumTracks.length).toFixed(2);
+
+    // Средние по критериям
+    const avgInstrumental = (albumTracks.reduce((sum, t) => sum + t.instrumental, 0) / albumTracks.length).toFixed(1);
+    const avgMeaning = (albumTracks.reduce((sum, t) => sum + t.meaning, 0) / albumTracks.length).toFixed(1);
+    const avgVibe = (albumTracks.reduce((sum, t) => sum + t.vibe, 0) / albumTracks.length).toFixed(1);
+    const avgStructure = (albumTracks.reduce((sum, t) => sum + t.structure, 0) / albumTracks.length).toFixed(1);
+    const avgOriginality = (albumTracks.reduce((sum, t) => sum + t.originality, 0) / albumTracks.length).toFixed(1);
+    const avgReplayability = (albumTracks.reduce((sum, t) => sum + t.replayability, 0) / albumTracks.length).toFixed(1);
+
+    const vocalsCount = albumTracks.filter(t => t.has_vocals).length;
+    const avgCharisma = vocalsCount > 0 
+        ? (albumTracks.filter(t => t.has_vocals).reduce((sum, t) => sum + t.charisma, 0) / vocalsCount).toFixed(1)
+        : '—';
+
+    body.innerHTML = `
+        <h2 style="margin: 20px; text-align: center;">📊 Статистика альбома</h2>
+        
+        <div class="stats-section">
+            <h3>🏆 Лучший трек</h3>
+            <div class="stats-track">
+                <span>${best.title}</span>
+                <span style="color: ${getScoreColor(best.total_score)}">${best.total_score.toFixed(1)}</span>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h3>📉 Худший трек</h3>
+            <div class="stats-track">
+                <span>${worst.title}</span>
+                <span style="color: ${getScoreColor(worst.total_score)}">${worst.total_score.toFixed(1)}</span>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h3>📈 Средние оценки по критериям</h3>
+            <div class="score-row"><span>Инструментал</span><span style="color: ${getScoreColor(parseFloat(avgInstrumental))}">${avgInstrumental}</span></div>
+            ${vocalsCount > 0 ? `<div class="score-row"><span>Харизма</span><span style="color: ${getScoreColor(parseFloat(avgCharisma))}">${avgCharisma}</span></div>` : ''}
+            <div class="score-row"><span>Смысл</span><span style="color: ${getScoreColor(parseFloat(avgMeaning))}">${avgMeaning}</span></div>
+            <div class="score-row"><span>Вайб</span><span style="color: ${getScoreColor(parseFloat(avgVibe))}">${avgVibe}</span></div>
+            <div class="score-row"><span>Структура</span><span style="color: ${getScoreColor(parseFloat(avgStructure))}">${avgStructure}</span></div>
+            <div class="score-row"><span>Оригинальность</span><span style="color: ${getScoreColor(parseFloat(avgOriginality))}">${avgOriginality}</span></div>
+            <div class="score-row"><span>Репитабельность</span><span style="color: ${getScoreColor(parseFloat(avgReplayability))}">${avgReplayability}</span></div>
+        </div>
+
+        <div class="stats-section">
+            <h3>📊 Общая информация</h3>
+            <div class="score-row"><span>Всего треков</span><span>${albumTracks.length}</span></div>
+            <div class="score-row"><span>Средняя оценка</span><span style="color: ${getScoreColor(parseFloat(avgScore))}">${avgScore}</span></div>
+            <div class="score-row"><span>Разброс оценок</span><span>${worst.total_score.toFixed(1)} — ${best.total_score.toFixed(1)}</span></div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+}
+
 async function deleteTrack(trackId) {
     if (!confirm('Удалить трек?')) return;
     await supabaseClient.from('tracks').delete().eq('id', trackId);
@@ -203,25 +275,34 @@ async function deleteTrack(trackId) {
     loadAlbum();
 }
 
-function openStatsModal() {
-    // Код статистики (он был правильный в прошлом ответе)
-    // ...
-    // Вставь сюда код статистики из прошлого ответа, если нужно, или оставь как есть
-    document.getElementById('stats-modal').classList.remove('hidden');
-}
-
-// Event Listeners
 document.getElementById('sort-select').addEventListener('change', applyFilters);
 document.getElementById('score-filter').addEventListener('change', applyFilters);
+
 document.getElementById('stats-btn').addEventListener('click', openStatsModal);
+
 document.getElementById('delete-album-btn').addEventListener('click', async () => {
-    if (!confirm('Удалить альбом?')) return;
+    if (!confirm('Удалить альбом и ВСЕ его треки? Это действие нельзя отменить!')) return;
+    if (!confirm('Ты уверен? Все треки будут удалены!')) return;
+    
     await supabaseClient.from('tracks').delete().eq('album_id', albumId);
     await supabaseClient.from('albums').delete().eq('id', albumId);
     window.location.href = 'index.html';
 });
-document.getElementById('modal-close').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
-document.getElementById('stats-modal-close').addEventListener('click', () => document.getElementById('stats-modal').classList.add('hidden'));
-document.getElementById('modal').addEventListener('click', (e) => { if(e.target.id==='modal') document.getElementById('modal').classList.add('hidden') });
+
+document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('modal').classList.add('hidden');
+});
+
+document.getElementById('stats-modal-close').addEventListener('click', () => {
+    document.getElementById('stats-modal').classList.add('hidden');
+});
+
+document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target.id === 'modal') document.getElementById('modal').classList.add('hidden');
+});
+
+document.getElementById('stats-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'stats-modal') document.getElementById('stats-modal').classList.add('hidden');
+});
 
 loadAlbum();
