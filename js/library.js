@@ -80,7 +80,8 @@ function updateReorderButton() {
     let sortSelect = currentTab === 'tracks' ? document.getElementById('sort-select').value : 
                      currentTab === 'albums' ? document.getElementById('albums-sort-select').value : 
                      document.getElementById('artists-sort-select').value;
-    reorderBtn.classList.toggle('hidden', !(sortSelect === 'score-desc' || sortSelect === 'score-asc'));
+    const isScoreSort = sortSelect === 'score-desc' || sortSelect === 'score-asc';
+    reorderBtn.classList.toggle('hidden', !isScoreSort);
 }
 
 function applyFilters() {
@@ -225,11 +226,12 @@ function openTrackModal(trackId) {
     const artist = allArtists.find(a => a.id === track.artist_id);
     const album = allAlbums.find(a => a.id === track.album_id);
     const cover = getTrackCover(track);
+    const scoreColor = getScoreColor(track.total_score);
     
     document.getElementById('modal-body').innerHTML = `
         <div class="modal-header">
             <div class="modal-cover">${cover ? `<img src="${cover}">` : '🎵'}</div>
-            <div><div class="modal-title">${track.title}</div><div class="modal-artist">${artist?.name || track.artist}</div>${album ? `<div class="modal-album">💿 ${album.title}</div>` : ''}<div class="modal-total" style="color: ${getScoreColor(track.total_score)}">${track.total_score.toFixed(1)}</div></div>
+            <div><div class="modal-title">${track.title}</div><div class="modal-artist">${artist?.name || track.artist}</div>${album ? `<div class="modal-album">💿 ${album.title}</div>` : ''}<div class="modal-total" style="color: ${scoreColor}">${track.total_score.toFixed(1)}</div></div>
         </div>
         <div class="modal-scores">
             <div class="score-row"><span class="score-label">Инструментал</span><span class="score-value" style="color: ${getScoreColor(track.instrumental)}">${track.instrumental}</span></div>
@@ -241,6 +243,12 @@ function openTrackModal(trackId) {
             <div class="score-row"><span class="score-label">Репитабельность</span><span class="score-value" style="color: ${getScoreColor(track.replayability)}">${track.replayability}</span></div>
         </div>
         ${track.notes ? `<div class="modal-notes"><strong>Заметки:</strong> ${track.notes}</div>` : ''}
+        ${(track.spotify_url || track.youtube_url) ? `
+        <div class="modal-links">
+            ${track.spotify_url ? `<a href="${track.spotify_url}" target="_blank" class="link-btn spotify">Spotify</a>` : ''}
+            ${track.youtube_url ? `<a href="${track.youtube_url}" target="_blank" class="link-btn youtube">YouTube</a>` : ''}
+        </div>
+        ` : ''}
         <div class="modal-actions-row"><a href="edit-track.html?id=${track.id}" class="btn-edit">✏️ Редактировать</a><button class="btn-delete" onclick="deleteTrack('${track.id}')">🗑️</button></div>
     `;
     modal.classList.remove('hidden');
@@ -271,7 +279,7 @@ function openReorderModal() {
             if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
             return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
         }).map(a => ({ id: a.id, title: a.title, subtitle: allArtists.find(ar => ar.id === a.artist_id)?.name || '', score: a.avgScore, cover: a.image_url }));
-    } else return; // Artists reorder not implemented for simplicity
+    } else return; 
 
     document.getElementById('reorder-list').innerHTML = items.map((item, i) => `
         <div class="reorder-item" data-id="${item.id}" data-index="${i}">
@@ -363,4 +371,4 @@ document.getElementById('menu-btn')?.addEventListener('click', () => document.ge
 document.addEventListener('click', (e) => { if (!e.target.closest('#menu-btn') && !e.target.closest('#menu-dropdown')) document.getElementById('menu-dropdown')?.classList.add('hidden'); });
 document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
 
-loadData();
+loadData();ы
