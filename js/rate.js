@@ -49,6 +49,8 @@ async function loadData() {
             document.getElementById('artist-input').value = album.artist;
             selectedArtistId = album.artist_id;
             document.getElementById('back-btn').href = `album.html?id=${presetAlbumId}`;
+            // Устанавливаем фон, если у альбома есть обложка
+            if(album.image_url) document.getElementById('bg-cover').style.backgroundImage = `url(${album.image_url})`;
         }
     }
 
@@ -124,6 +126,8 @@ document.getElementById('image-file').addEventListener('change', (e) => {
             const preview = document.getElementById('image-preview');
             preview.innerHTML = `<img src="${e.target.result}" alt="">`;
             preview.classList.add('has-image');
+            // Устанавливаем фон
+            document.getElementById('bg-cover').style.backgroundImage = `url(${e.target.result})`;
         };
         reader.readAsDataURL(file);
     }
@@ -215,6 +219,10 @@ document.getElementById('rate-form').addEventListener('submit', async (e) => {
     let imageUrl = null;
     if (selectedFile) {
         imageUrl = await uploadImage(selectedFile);
+    } else if (albumId) {
+        // Если картинка не выбрана, берем от альбома
+        const album = allAlbums.find(a => a.id === albumId);
+        if(album) imageUrl = album.image_url;
     }
 
     const trackData = {

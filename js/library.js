@@ -371,4 +371,4 @@ document.getElementById('menu-btn')?.addEventListener('click', () => document.ge
 document.addEventListener('click', (e) => { if (!e.target.closest('#menu-btn') && !e.target.closest('#menu-dropdown')) document.getElementById('menu-dropdown')?.classList.add('hidden'); });
 document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
 
-loadData();ы
+loadData();
