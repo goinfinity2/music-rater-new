@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Альбом</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn">←</a>
+            <h1 id="page-title">Альбом</h1>
+            <div class="header-actions">
+                <a href="#" id="edit-album-btn" class="btn-icon" title="Редактировать">✏️</a>
+                <button id="stats-btn" class="btn-icon" title="Статистика">📊</button>
+            </div>
+        </header>
+
+        <div id="album-info" class="album-detail-info"></div>
+
+        <div class="filters-bar">
+            <select id="sort-select">
+                <option value="date">По дате</option>
+                <option value="score-desc">Оценка ↓</option>
+                <option value="score-asc">Оценка ↑</option>
+                <option value="title">По названию</option>
+            </select>
+            <select id="score-filter">
+                <option value="all">Все оценки</option>
+                <option value="9">9+</option>
+                <option value="8">8+</option>
+                <option value="7">7+</option>
+                <option value="low">Ниже 5</option>
+            </select>
+        </div>
+
+        <div class="section-header">
+            <span id="tracks-count"></span>
+            <a id="add-track-btn" href="#" class="btn-small">+ Трек</a>
+        </div>
+
+        <div id="album-tracks" class="tracks-list"></div>
+
+        <div id="empty-tracks" class="empty-state hidden">
+            <span class="empty-icon">🎵</span>
+            <p>В альбоме пока нет треков</p>
+        </div>
+
+        <div class="danger-zone">
+            <button id="delete-album-btn" class="btn-danger">🗑 Удалить альбом со всеми треками</button>
+        </div>
+    </div>
+
+    <!-- Модалки -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="stats-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="stats-modal-close">✕</button>
+            <div id="stats-modal-body"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/album.js"></script>
+</body>
+</html>

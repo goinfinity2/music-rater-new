@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Резервное копирование</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn">←</a>
+            <h1>Бэкап</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div class="backup-section">
+            <h2>📤 Экспорт данных</h2>
+            <p>Скачай свою библиотеку в файл для сохранения или переноса</p>
+            <div class="backup-buttons">
+                <button id="export-json" class="btn-primary">Скачать JSON</button>
+                <button id="export-csv" class="btn-secondary">Скачать CSV</button>
+            </div>
+        </div>
+
+        <div class="backup-section">
+            <h2>📥 Импорт данных</h2>
+            <p>Загрузи данные из ранее сохранённого файла</p>
+            <div class="import-area">
+                <label class="import-label" for="import-file">
+                    <span>📁</span>
+                    <span>Выбери файл JSON</span>
+                </label>
+                <input type="file" id="import-file" accept=".json" hidden>
+            </div>
+            <p id="import-status" class="import-status"></p>
+        </div>
+
+        <div class="backup-section">
+            <h2>📊 Информация</h2>
+            <div id="backup-info" class="backup-info"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/backup.js"></script>
+</body>
+</html>

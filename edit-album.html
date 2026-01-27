@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать альбом</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn" id="back-btn">←</a>
+            <h1>Редактировать</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <form id="edit-form" class="rate-form">
+            <div class="input-group">
+                <input type="text" id="title" placeholder="Название альбома" required>
+            </div>
+
+            <div class="input-group autocomplete-container">
+                <input type="text" id="artist-input" placeholder="Артист" autocomplete="off" required>
+                <div id="artist-suggestions" class="suggestions hidden"></div>
+            </div>
+
+            <div class="input-group">
+                <input type="number" id="year" placeholder="Год выпуска" min="1900" max="2099">
+            </div>
+
+            <div class="image-upload">
+                <label class="upload-label" for="image-file">
+                    <div id="image-preview" class="image-preview">
+                        <span>📷</span>
+                        <small>Изменить обложку</small>
+                    </div>
+                </label>
+                <input type="file" id="image-file" accept="image/*" hidden>
+            </div>
+
+            <div class="input-group">
+                <input type="url" id="spotify-url" placeholder="Ссылка на Spotify (необязательно)">
+            </div>
+
+            <div class="input-group">
+                <input type="url" id="youtube-url" placeholder="Ссылка на YouTube (необязательно)">
+            </div>
+
+            <button type="submit" class="btn-primary btn-save">Сохранить изменения</button>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/edit-album.js"></script>
+</body>
+</html>

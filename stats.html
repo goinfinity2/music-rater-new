@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn">←</a>
+            <h1>Статистика</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <!-- Профиль и уровень -->
+        <div id="level-card" class="level-card"></div>
+
+        <!-- Навигация -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">Обзор</button>
+            <button class="nav-tab" data-tab="history">История</button>
+            <button class="nav-tab" data-tab="compare">Сравнение</button>
+        </nav>
+
+        <!-- Обзор -->
+        <div id="overview-section" class="section">
+            <div id="overview-stats" class="stats-grid"></div>
+            
+            <h2 class="section-title">🏆 Топ-10 треков</h2>
+            <div id="top-tracks" class="top-list"></div>
+
+            <h2 class="section-title">🎤 Топ-5 артистов</h2>
+            <div id="top-artists" class="top-list"></div>
+
+            <h2 class="section-title">💿 Топ-5 альбомов</h2>
+            <div id="top-albums" class="top-list"></div>
+
+            <h2 class="section-title">📊 Распределение оценок</h2>
+            <div id="score-distribution" class="distribution-chart"></div>
+
+            <h2 class="section-title">📈 Средние по критериям</h2>
+            <div id="criteria-averages" class="criteria-chart"></div>
+        </div>
+
+        <!-- История -->
+        <div id="history-section" class="section hidden">
+            <div class="history-filters">
+                <select id="history-period">
+                    <option value="week">За неделю</option>
+                    <option value="month">За месяц</option>
+                    <option value="all">Всё время</option>
+                </select>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+
+        <!-- Сравнение -->
+        <div id="compare-section" class="section hidden">
+            <div class="compare-selectors">
+                <select id="artist1-select">
+                    <option value="">Выбери артиста 1</option>
+                </select>
+                <span class="vs">VS</span>
+                <select id="artist2-select">
+                    <option value="">Выбери артиста 2</option>
+                </select>
+            </div>
+            <div id="compare-result" class="compare-result"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/stats.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Артист</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn">←</a>
+            <h1 id="page-title">Артист</h1>
+            <button id="stats-btn" class="btn-icon" title="Статистика">📊</button>
+        </header>
+
+        <div id="artist-info" class="artist-detail-info"></div>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="albums">Альбомы</button>
+            <button class="nav-tab" data-tab="tracks">Треки</button>
+        </nav>
+
+        <!-- Фильтры для треков -->
+        <div id="tracks-filters" class="filters-section hidden">
+            <div class="filters-bar">
+                <select id="sort-select">
+                    <option value="date">По дате</option>
+                    <option value="score-desc">Оценка ↓</option>
+                    <option value="score-asc">Оценка ↑</option>
+                    <option value="title">По названию</option>
+                </select>
+                <select id="album-filter">
+                    <option value="all">Все</option>
+                    <option value="no-album">Синглы</option>
+                </select>
+                <select id="score-filter">
+                    <option value="all">Все оценки</option>
+                    <option value="9">9+</option>
+                    <option value="8">8+</option>
+                    <option value="7">7+</option>
+                    <option value="low">Ниже 5</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Альбомы -->
+        <div id="albums-section" class="section">
+            <div class="section-header">
+                <span id="albums-count"></span>
+                <a id="add-album-btn" href="#" class="btn-small">+ Альбом</a>
+            </div>
+            <div id="artist-albums" class="albums-grid"></div>
+        </div>
+
+        <!-- Треки -->
+        <div id="tracks-section" class="section hidden">
+            <div class="section-header">
+                <span id="tracks-count"></span>
+                <a id="add-track-btn" href="#" class="btn-small">+ Трек</a>
+            </div>
+            <div id="artist-tracks" class="tracks-list"></div>
+        </div>
+
+        <div class="danger-zone">
+            <button id="delete-artist-btn" class="btn-danger">🗑 Удалить артиста со всеми данными</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно трека -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно статистики -->
+    <div id="stats-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="stats-modal-close">✕</button>
+            <div id="stats-modal-body"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/artist.js"></script>
+</body>
+</html>

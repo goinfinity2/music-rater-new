@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Music Rater</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>Music Rater</h1>
+            <div class="header-actions">
+                <a href="search.html" class="btn-icon" title="Поиск">🔍</a>
+                <a href="stats.html" class="btn-icon" title="Статистика">📊</a>
+                <button id="menu-btn" class="btn-icon" title="Меню">☰</button>
+            </div>
+        </header>
+
+        <!-- Меню -->
+        <div id="menu-dropdown" class="menu-dropdown hidden">
+            <a href="backup.html" class="menu-item">💾 Бэкап данных</a>
+            <button id="view-toggle" class="menu-item">▦ Изменить вид</button>
+            <button id="logout-btn" class="menu-item">🚪 Выйти</button>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="tracks">Треки</button>
+            <button class="nav-tab" data-tab="albums">Альбомы</button>
+            <button class="nav-tab" data-tab="artists">Артисты</button>
+        </nav>
+
+        <div id="stats-bar" class="stats-bar"></div>
+
+        <!-- Фильтры для треков -->
+        <div id="tracks-filters" class="filters-section">
+            <div class="filters-bar">
+                <select id="sort-select">
+                    <option value="date">По дате</option>
+                    <option value="score-desc">Оценка ↓</option>
+                    <option value="score-asc">Оценка ↑</option>
+                    <option value="title">По названию</option>
+                </select>
+                <select id="artist-filter">
+                    <option value="all">Все артисты</option>
+                </select>
+            </div>
+            <div class="filters-bar">
+                <select id="album-filter">
+                    <option value="all">Все альбомы</option>
+                    <option value="no-album">Без альбома</option>
+                </select>
+                <select id="score-filter">
+                    <option value="all">Все оценки</option>
+                    <option value="9">9+ Шедевры</option>
+                    <option value="8">8+ Отличные</option>
+                    <option value="7">7+ Хорошие</option>
+                    <option value="6">6+ Нормальные</option>
+                    <option value="low">Ниже 5</option>
+                </select>
+            </div>
+            <button id="reorder-btn" class="btn-reorder hidden">↕️ Изменить порядок</button>
+        </div>
+
+        <!-- Фильтры для альбомов -->
+        <div id="albums-filters" class="filters-section hidden">
+            <div class="filters-bar">
+                <select id="albums-sort-select">
+                    <option value="date">По дате</option>
+                    <option value="score-desc">Оценка ↓</option>
+                    <option value="score-asc">Оценка ↑</option>
+                    <option value="title">По названию</option>
+                    <option value="year">По году</option>
+                </select>
+                <select id="albums-artist-filter">
+                    <option value="all">Все артисты</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Фильтры для артистов -->
+        <div id="artists-filters" class="filters-section hidden">
+            <div class="filters-bar">
+                <select id="artists-sort-select">
+                    <option value="name">По имени</option>
+                    <option value="score-desc">Оценка ↓</option>
+                    <option value="score-asc">Оценка ↑</option>
+                    <option value="tracks">По кол-ву треков</option>
+                    <option value="albums">По кол-ву альбомов</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Секции -->
+        <div id="tracks-section" class="section">
+            <div id="tracks-list" class="tracks-list"></div>
+            <div id="empty-tracks" class="empty-state hidden">
+                <span class="empty-icon">🎵</span>
+                <p>Треков пока нет</p>
+            </div>
+        </div>
+
+        <div id="albums-section" class="section hidden">
+            <div id="albums-list" class="albums-grid"></div>
+            <div id="empty-albums" class="empty-state hidden">
+                <span class="empty-icon">💿</span>
+                <p>Альбомов пока нет</p>
+            </div>
+        </div>
+
+        <div id="artists-section" class="section hidden">
+            <div id="artists-list" class="artists-list"></div>
+            <div id="empty-artists" class="empty-state hidden">
+                <span class="empty-icon">🎤</span>
+                <p>Артистов пока нет</p>
+            </div>
+        </div>
+
+        <!-- FAB -->
+        <div class="fab-container">
+            <button id="fab-btn" class="fab">+</button>
+            <div id="fab-menu" class="fab-menu hidden">
+                <a href="rate.html" class="fab-option">🎵 Трек</a>
+                <a href="add-album.html" class="fab-option">💿 Альбом</a>
+                <a href="add-artist.html" class="fab-option">🎤 Артист</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно изменения порядка -->
+    <div id="reorder-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header-bar">
+                <h2>Изменить порядок</h2>
+                <button class="modal-close" id="reorder-modal-close">✕</button>
+            </div>
+            <p class="reorder-hint">Перетаскивай элементы для изменения порядка</p>
+            <div id="reorder-list" class="reorder-list"></div>
+            <div class="modal-actions">
+                <button id="save-order-btn" class="btn-primary">Сохранить порядок</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/library.js"></script>
+</body>
+</html>

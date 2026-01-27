@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценить трек</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <a href="index.html" class="back-btn" id="back-btn">←</a>
+            <h1>Оценить трек</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <form id="rate-form" class="rate-form">
+            <div class="input-group">
+                <input type="text" id="title" placeholder="Название трека" required>
+            </div>
+
+            <div class="input-group autocomplete-container">
+                <input type="text" id="artist-input" placeholder="Артист" autocomplete="off" required>
+                <div id="artist-suggestions" class="suggestions hidden"></div>
+            </div>
+
+            <div class="input-group">
+                <select id="album-select">
+                    <option value="">Без альбома (сингл)</option>
+                </select>
+            </div>
+
+            <div class="image-upload">
+                <label class="upload-label" for="image-file">
+                    <div id="image-preview" class="image-preview">
+                        <span>📷</span>
+                        <small>Обложка (необязательно)</small>
+                    </div>
+                </label>
+                <input type="file" id="image-file" accept="image/*" hidden>
+            </div>
+
+            <div class="toggle-row">
+                <span>Есть вокал?</span>
+                <label class="toggle">
+                    <input type="checkbox" id="has-vocals" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="sliders-container">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Инструментал <span class="tooltip" data-tip="Насколько приятно звучит музыка? Качает ли бит?">?</span></span>
+                        <span class="slider-value" id="instrumental-value">5.0</span>
+                    </div>
+                    <input type="range" id="instrumental" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group" id="charisma-group">
+                    <div class="slider-header">
+                        <span>Харизма <span class="tooltip" data-tip="Нравится ли голос? Веришь ли исполнителю?">?</span></span>
+                        <span class="slider-value" id="charisma-value">5.0</span>
+                    </div>
+                    <input type="range" id="charisma" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Смысл <span class="tooltip" data-tip="Интересный ли текст? Есть ли история?">?</span></span>
+                        <span class="slider-value" id="meaning-value">5.0</span>
+                    </div>
+                    <input type="range" id="meaning" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Вайб <span class="tooltip" data-tip="Создаёт ли трек настроение? Погружает?">?</span></span>
+                        <span class="slider-value" id="vibe-value">5.0</span>
+                    </div>
+                    <input type="range" id="vibe" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Структура <span class="tooltip" data-tip="Не скучно ли? Есть ли развитие?">?</span></span>
+                        <span class="slider-value" id="structure-value">5.0</span>
+                    </div>
+                    <input type="range" id="structure" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Оригинальность <span class="tooltip" data-tip="Звучит свежо или копия других?">?</span></span>
+                        <span class="slider-value" id="originality-value">5.0</span>
+                    </div>
+                    <input type="range" id="originality" min="1" max="10" step="0.5" value="5">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>Репитабельность <span class="tooltip" data-tip="Хочется включить ещё раз?">?</span></span>
+                        <span class="slider-value" id="replayability-value">5.0</span>
+                    </div>
+                    <input type="range" id="replayability" min="1" max="10" step="0.5" value="5">
+                </div>
+            </div>
+
+            <div class="total-score-box">
+                <span>ИТОГ</span>
+                <span id="total-score" class="total-value">5.0</span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-save">Добавить в библиотеку</button>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/rate.js"></script>
+</body>
+</html>
