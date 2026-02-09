@@ -172,9 +172,18 @@ function applyTracksFilters() {
     }
 
     filtered.sort((a, b) => {
-        if (sortBy === 'score-desc') return (b.total_score - a.total_score) || (b.custom_order || 0) - (a.custom_order || 0);
-        if (sortBy === 'score-asc') return (a.total_score - b.total_score) || (a.custom_order || 0) - (b.custom_order || 0);
-        if (sortBy === 'title') return a.title.localeCompare(b.title) || (b.custom_order || 0) - (a.custom_order || 0);
+        if (sortBy === 'score-desc') {
+            const scoreDiff = Math.round((b.total_score - a.total_score) * 100) / 100;
+            return scoreDiff === 0 ? (b.custom_order || 0) - (a.custom_order || 0) : scoreDiff;
+        }
+        if (sortBy === 'score-asc') {
+            const scoreDiff = Math.round((a.total_score - b.total_score) * 100) / 100;
+            return scoreDiff === 0 ? (a.custom_order || 0) - (b.custom_order || 0) : scoreDiff;
+        }
+        if (sortBy === 'title') {
+            const titleDiff = a.title.localeCompare(b.title);
+            return titleDiff !== 0 ? titleDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        }
         const dateDiff = new Date(b.created_at) - new Date(a.created_at);
         return dateDiff !== 0 ? dateDiff : (b.custom_order || 0) - (a.custom_order || 0);
     });
@@ -198,9 +207,19 @@ function applyAlbumsFilters() {
     filtered = filtered.map(a => ({ ...a, avgScore: getAlbumAvgScore(a) }));
 
     filtered.sort((a, b) => {
-        if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
-        if (sortBy === 'score-asc') return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
-        if (sortBy === 'title') return a.title.localeCompare(b.title) || (b.custom_order || 0) - (a.custom_order || 0);
+        if (sortBy === 'score-desc') {
+            // Сравниваем с точностью 2 знака после запятой
+            const scoreDiff = Math.round((b.avgScore - a.avgScore) * 100) / 100;
+            return scoreDiff === 0 ? (b.custom_order || 0) - (a.custom_order || 0) : scoreDiff;
+        }
+        if (sortBy === 'score-asc') {
+            const scoreDiff = Math.round((a.avgScore - b.avgScore) * 100) / 100;
+            return scoreDiff === 0 ? (a.custom_order || 0) - (b.custom_order || 0) : scoreDiff;
+        }
+        if (sortBy === 'title') {
+            const titleDiff = a.title.localeCompare(b.title);
+            return titleDiff !== 0 ? titleDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        }
         if (sortBy === 'year') {
             const yearDiff = (b.year || 0) - (a.year || 0);
             return yearDiff !== 0 ? yearDiff : (b.custom_order || 0) - (a.custom_order || 0);
@@ -223,8 +242,14 @@ function applyArtistsFilters() {
     });
 
     filtered.sort((a, b) => {
-        if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
-        if (sortBy === 'score-asc') return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
+        if (sortBy === 'score-desc') {
+            const scoreDiff = Math.round((b.avgScore - a.avgScore) * 100) / 100;
+            return scoreDiff === 0 ? (b.custom_order || 0) - (a.custom_order || 0) : scoreDiff;
+        }
+        if (sortBy === 'score-asc') {
+            const scoreDiff = Math.round((a.avgScore - b.avgScore) * 100) / 100;
+            return scoreDiff === 0 ? (a.custom_order || 0) - (b.custom_order || 0) : scoreDiff;
+        }
         if (sortBy === 'tracks') {
             const trackDiff = b.trackCount - a.trackCount;
             return trackDiff !== 0 ? trackDiff : (b.custom_order || 0) - (a.custom_order || 0);
