@@ -174,8 +174,9 @@ function applyTracksFilters() {
     filtered.sort((a, b) => {
         if (sortBy === 'score-desc') return (b.total_score - a.total_score) || (b.custom_order || 0) - (a.custom_order || 0);
         if (sortBy === 'score-asc') return (a.total_score - b.total_score) || (a.custom_order || 0) - (b.custom_order || 0);
-        if (sortBy === 'title') return a.title.localeCompare(b.title);
-        return new Date(b.created_at) - new Date(a.created_at);
+        if (sortBy === 'title') return a.title.localeCompare(b.title) || (b.custom_order || 0) - (a.custom_order || 0);
+        const dateDiff = new Date(b.created_at) - new Date(a.created_at);
+        return dateDiff !== 0 ? dateDiff : (b.custom_order || 0) - (a.custom_order || 0);
     });
     renderTracks(filtered);
 }
@@ -196,9 +197,13 @@ function applyAlbumsFilters() {
     filtered.sort((a, b) => {
         if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
         if (sortBy === 'score-asc') return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
-        if (sortBy === 'title') return a.title.localeCompare(b.title);
-        if (sortBy === 'year') return (b.year || 0) - (a.year || 0);
-        return new Date(b.created_at) - new Date(a.created_at);
+        if (sortBy === 'title') return a.title.localeCompare(b.title) || (b.custom_order || 0) - (a.custom_order || 0);
+        if (sortBy === 'year') {
+            const yearDiff = (b.year || 0) - (a.year || 0);
+            return yearDiff !== 0 ? yearDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        }
+        const dateDiff = new Date(b.created_at) - new Date(a.created_at);
+        return dateDiff !== 0 ? dateDiff : (b.custom_order || 0) - (a.custom_order || 0);
     });
     renderAlbums(filtered);
 }
@@ -214,9 +219,16 @@ function applyArtistsFilters() {
     filtered.sort((a, b) => {
         if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
         if (sortBy === 'score-asc') return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
-        if (sortBy === 'tracks') return b.trackCount - a.trackCount;
-        if (sortBy === 'albums') return b.albumCount - a.albumCount;
-        return a.name.localeCompare(b.name);
+        if (sortBy === 'tracks') {
+            const trackDiff = b.trackCount - a.trackCount;
+            return trackDiff !== 0 ? trackDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        }
+        if (sortBy === 'albums') {
+            const albumDiff = b.albumCount - a.albumCount;
+            return albumDiff !== 0 ? albumDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        }
+        const nameDiff = a.name.localeCompare(b.name);
+        return nameDiff !== 0 ? nameDiff : (b.custom_order || 0) - (a.custom_order || 0);
     });
     renderArtists(filtered);
 }
