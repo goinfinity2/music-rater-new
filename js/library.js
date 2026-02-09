@@ -24,7 +24,9 @@ async function loadData() {
     const { data: tracks, error: tracksError } = await supabaseClient
         .from('tracks')
         .select('*')
-        .eq('user_id', session.user.id);
+        .eq('user_id', session.user.id)
+        .order('custom_order', { ascending: false })
+        .order('created_at', { ascending: false });
     
     if (tracksError) {
         console.error('Ошибка при загрузке треков:', tracksError);
@@ -37,7 +39,9 @@ async function loadData() {
     const { data: albums, error: albumsError } = await supabaseClient
         .from('albums')
         .select('*')
-        .eq('user_id', session.user.id);
+        .eq('user_id', session.user.id)
+        .order('custom_order', { ascending: false })
+        .order('created_at', { ascending: false });
     
     if (albumsError) {
         console.error('Ошибка при загрузке альбомов:', albumsError);
@@ -50,7 +54,9 @@ async function loadData() {
     const { data: artists, error: artistsError } = await supabaseClient
         .from('artists')
         .select('*')
-        .eq('user_id', session.user.id);
+        .eq('user_id', session.user.id)
+        .order('custom_order', { ascending: false })
+        .order('name');
     
     if (artistsError) {
         console.error('Ошибка при загрузке артистов:', artistsError);
