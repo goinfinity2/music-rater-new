@@ -71,6 +71,7 @@ async function loadData() {
         console.log('Первый трек с custom_order:', allTracks[0].custom_order);
     }
     if (allAlbums.length > 0) {
+        console.log('allAlbums порядок после загрузки:', allAlbums.map(a => ({ id: a.id.substring(0, 8), title: a.title, custom_order: a.custom_order })));
         console.log('Первый альбом с custom_order:', allAlbums[0].custom_order);
     }
     if (allArtists.length > 0) {
@@ -201,7 +202,10 @@ function applyAlbumsFilters() {
     const artistFilter = document.getElementById('albums-artist-filter').value;
     let filtered = [...allAlbums];
     
-    console.log('applyAlbumsFilters: сортировка =', sortBy, ', allAlbums перед фильтром:', allAlbums.map(a => ({ id: a.id, custom_order: a.custom_order })));
+    console.log('%c=== applyAlbumsFilters ===', 'color: blue; font-weight: bold');
+    console.log('Текущая сортировка:', sortBy);
+    console.log('allAlbums[0]:', allAlbums[0]?.title, 'custom_order:', allAlbums[0]?.custom_order);
+    console.log('allAlbums порядок:', allAlbums.map(a => a.custom_order));
     
     if (artistFilter !== 'all') filtered = filtered.filter(a => a.artist_id === artistFilter);
     filtered = filtered.map(a => ({ ...a, avgScore: getAlbumAvgScore(a) }));
@@ -224,11 +228,14 @@ function applyAlbumsFilters() {
             const yearDiff = (b.year || 0) - (a.year || 0);
             return yearDiff !== 0 ? yearDiff : (b.custom_order || 0) - (a.custom_order || 0);
         }
+        // По дате - включаем custom_order как вторичный критерий
         const dateDiff = new Date(b.created_at) - new Date(a.created_at);
-        return dateDiff !== 0 ? dateDiff : (b.custom_order || 0) - (a.custom_order || 0);
+        if (dateDiff !== 0) return dateDiff;
+        return (b.custom_order || 0) - (a.custom_order || 0);
     });
     
-    console.log('applyAlbumsFilters: после сортировки:', filtered.map(a => ({ id: a.id, title: a.title, custom_order: a.custom_order })));
+    console.log('После сортировки по', sortBy, ':', filtered.map(a => ({ title: a.title, custom_order: a.custom_order })));
+    console.log('%c=== конец applyAlbumsFilters ===', 'color: blue; font-weight: bold');
     
     renderAlbums(filtered);
 }
