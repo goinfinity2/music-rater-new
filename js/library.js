@@ -76,12 +76,28 @@ function updateStats() {
 
 function updateReorderButton() {
     const reorderBtn = document.getElementById('reorder-btn');
-    if (!reorderBtn) return;
-    let sortSelect = currentTab === 'tracks' ? document.getElementById('sort-select').value : 
-                     currentTab === 'albums' ? document.getElementById('albums-sort-select').value : 
-                     document.getElementById('artists-sort-select').value;
-    const isScoreSort = sortSelect === 'score-desc' || sortSelect === 'score-asc';
-    reorderBtn.classList.toggle('hidden', !isScoreSort);
+    const albumsReorderBtn = document.getElementById('albums-reorder-btn');
+    const artistsReorderBtn = document.getElementById('artists-reorder-btn');
+    
+    if (currentTab === 'tracks') {
+        const sortSelect = document.getElementById('sort-select').value;
+        const isScoreSort = sortSelect === 'score-desc' || sortSelect === 'score-asc';
+        if (reorderBtn) reorderBtn.classList.toggle('hidden', !isScoreSort);
+        if (albumsReorderBtn) albumsReorderBtn.classList.add('hidden');
+        if (artistsReorderBtn) artistsReorderBtn.classList.add('hidden');
+    } else if (currentTab === 'albums') {
+        const sortSelect = document.getElementById('albums-sort-select').value;
+        const isScoreSort = sortSelect === 'score-desc' || sortSelect === 'score-asc';
+        if (albumsReorderBtn) albumsReorderBtn.classList.toggle('hidden', !isScoreSort);
+        if (reorderBtn) reorderBtn.classList.add('hidden');
+        if (artistsReorderBtn) artistsReorderBtn.classList.add('hidden');
+    } else if (currentTab === 'artists') {
+        const sortSelect = document.getElementById('artists-sort-select').value;
+        const isScoreSort = sortSelect === 'score-desc' || sortSelect === 'score-asc';
+        if (artistsReorderBtn) artistsReorderBtn.classList.toggle('hidden', !isScoreSort);
+        if (reorderBtn) reorderBtn.classList.add('hidden');
+        if (albumsReorderBtn) albumsReorderBtn.classList.add('hidden');
+    }
 }
 
 function applyFilters() {
@@ -265,6 +281,7 @@ async function deleteTrack(trackId) {
 function openReorderModal() {
     const modal = document.getElementById('reorder-modal');
     let items = [];
+    
     if (currentTab === 'tracks') {
         reorderType = 'tracks';
         const sortBy = document.getElementById('sort-select').value;
@@ -279,7 +296,18 @@ function openReorderModal() {
             if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
             return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
         }).map(a => ({ id: a.id, title: a.title, subtitle: allArtists.find(ar => ar.id === a.artist_id)?.name || '', score: a.avgScore, cover: a.image_url }));
-    } else return; 
+    } else if (currentTab === 'artists') {
+        reorderType = 'artists';
+        const sortBy = document.getElementById('artists-sort-select').value;
+        items = allArtists.map(artist => {
+            const tracks = allTracks.filter(t => t.artist_id === artist.id);
+            const avgScore = tracks.length > 0 ? tracks.reduce((s, t) => s + t.total_score, 0) / tracks.length : 0;
+            return { ...artist, avgScore, score: avgScore };
+        }).sort((a, b) => {
+            if (sortBy === 'score-desc') return (b.avgScore - a.avgScore) || (b.custom_order || 0) - (a.custom_order || 0);
+            return (a.avgScore - b.avgScore) || (a.custom_order || 0) - (b.custom_order || 0);
+        }).map(a => ({ id: a.id, title: a.name, subtitle: '', score: a.avgScore, cover: a.image_url }));
+    } else return;
 
     document.getElementById('reorder-list').innerHTML = items.map((item, i) => `
         <div class="reorder-item" data-id="${item.id}" data-index="${i}">
@@ -449,6 +477,8 @@ document.getElementById('view-toggle').addEventListener('click', () => {
 });
 
 document.getElementById('reorder-btn').addEventListener('click', openReorderModal);
+document.getElementById('albums-reorder-btn').addEventListener('click', openReorderModal);
+document.getElementById('artists-reorder-btn').addEventListener('click', openReorderModal);
 document.getElementById('save-order-btn').addEventListener('click', saveOrder);
 document.getElementById('reorder-modal-close').addEventListener('click', () => document.getElementById('reorder-modal').classList.add('hidden'));
 document.getElementById('fab-btn').addEventListener('click', () => document.getElementById('fab-menu').classList.toggle('hidden'));
