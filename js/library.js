@@ -191,6 +191,9 @@ function applyAlbumsFilters() {
     const sortBy = document.getElementById('albums-sort-select').value;
     const artistFilter = document.getElementById('albums-artist-filter').value;
     let filtered = [...allAlbums];
+    
+    console.log('applyAlbumsFilters: сортировка =', sortBy, ', allAlbums перед фильтром:', allAlbums.map(a => ({ id: a.id, custom_order: a.custom_order })));
+    
     if (artistFilter !== 'all') filtered = filtered.filter(a => a.artist_id === artistFilter);
     filtered = filtered.map(a => ({ ...a, avgScore: getAlbumAvgScore(a) }));
 
@@ -205,6 +208,9 @@ function applyAlbumsFilters() {
         const dateDiff = new Date(b.created_at) - new Date(a.created_at);
         return dateDiff !== 0 ? dateDiff : (b.custom_order || 0) - (a.custom_order || 0);
     });
+    
+    console.log('applyAlbumsFilters: после сортировки:', filtered.map(a => ({ id: a.id, title: a.title, custom_order: a.custom_order })));
+    
     renderAlbums(filtered);
 }
 
@@ -262,6 +268,9 @@ function renderAlbums(albums) {
     const list = document.getElementById('albums-list');
     const empty = document.getElementById('empty-albums');
     list.className = viewMode === 'list' ? 'albums-list-view' : 'albums-grid';
+    
+    console.log('renderAlbums: порядок альбомов с custom_order:', albums.map(a => ({ id: a.id, title: a.title, custom_order: a.custom_order })));
+    
     if (albums.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
     list.innerHTML = albums.map(album => {
