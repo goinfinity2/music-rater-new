@@ -19,14 +19,57 @@ async function loadData() {
     const session = await checkAuth();
     if (!session) return;
 
-    const { data: tracks } = await supabaseClient.from('tracks').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('created_at', { ascending: false });
+    console.log('Загружаю данные...');
+    
+    const { data: tracks, error: tracksError } = await supabaseClient
+        .from('tracks')
+        .select('*')
+        .eq('user_id', session.user.id);
+    
+    if (tracksError) {
+        console.error('Ошибка при загрузке треков:', tracksError);
+    } else {
+        console.log('Загруженные треки:', tracks?.length, 'штук');
+    }
+    
     allTracks = tracks || [];
 
-    const { data: albums } = await supabaseClient.from('albums').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('created_at', { ascending: false });
+    const { data: albums, error: albumsError } = await supabaseClient
+        .from('albums')
+        .select('*')
+        .eq('user_id', session.user.id);
+    
+    if (albumsError) {
+        console.error('Ошибка при загрузке альбомов:', albumsError);
+    } else {
+        console.log('Загруженные альбомы:', albums?.length, 'штук');
+    }
+    
     allAlbums = albums || [];
 
-    const { data: artists } = await supabaseClient.from('artists').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('name');
+    const { data: artists, error: artistsError } = await supabaseClient
+        .from('artists')
+        .select('*')
+        .eq('user_id', session.user.id);
+    
+    if (artistsError) {
+        console.error('Ошибка при загрузке артистов:', artistsError);
+    } else {
+        console.log('Загруженные артисты:', artists?.length, 'штук');
+    }
+    
     allArtists = artists || [];
+
+    // Проверяем наличие поля custom_order в загруженных данных
+    if (allTracks.length > 0) {
+        console.log('Первый трек с custom_order:', allTracks[0].custom_order);
+    }
+    if (allAlbums.length > 0) {
+        console.log('Первый альбом с custom_order:', allAlbums[0].custom_order);
+    }
+    if (allArtists.length > 0) {
+        console.log('Первый артист с custom_order:', allArtists[0].custom_order);
+    }
 
     populateFilters();
     updateStats();
@@ -432,38 +475,58 @@ async function saveOrder() {
     saveBtn.disabled = true;
     
     try {
+        // Не закрываем модаль до завершения сохранения
+        
         // Сохраняем порядок для каждого элемента
         const updates = Array.from(items).map((item, index) => ({
             id: item.dataset.id,
             order: items.length - index
         }));
         
-        console.log('Сохраняем порядок в таблицу:', reorderType, updates);
+        console.log('Тип таблицы:', reorderType);
+        console.log('Элементы для сохранения:', updates);
+        
+        let successCount = 0;
+        let errorCount = 0;
         
         // Сохраняем все обновления
         for (const update of updates) {
-            const { data, error } = await supabaseClient
+            console.log(`Обновляю ${reorderType}: id=${update.id}, custom_order=${update.order}`);
+            
+            const { error } = await supabaseClient
                 .from(reorderType)
                 .update({ custom_order: update.order })
-                .eq('id', update.id)
-                .select();
+                .eq('id', update.id);
             
             if (error) {
-                console.error(`Ошибка при сохранении ${update.id}:`, error);
+                console.error(`❌ Ошибка при сохранении ${update.id}:`, error);
+                errorCount++;
             } else {
-                console.log(`Сохранено ${update.id} с порядком ${update.order}:`, data);
+                console.log(`✅ Успешно сохранено ${update.id} с порядком ${update.order}`);
+                successCount++;
             }
         }
         
-        // Закрываем модаль и перезагружаем данные
+        console.log(`Результат: успешно ${successCount}, ошибок ${errorCount}`);
+        
+        if (errorCount > 0) {
+            alert(`Сохранено ${successCount} из ${updates.length}. Ошибок: ${errorCount}`);
+        } else {
+            alert('Порядок успешно сохранён!');
+        }
+        
+        // Закрываем модаль
         document.getElementById('reorder-modal').classList.add('hidden');
+        
+        // Перезагружаем данные
         await loadData();
+        
         saveBtn.textContent = originalText;
         saveBtn.disabled = false;
         
     } catch (error) {
-        console.error('Ошибка при сохранении порядка:', error);
-        alert('Ошибка при сохранении порядка: ' + error.message);
+        console.error('Критическая ошибка при сохранении порядка:', error);
+        alert('Критическая ошибка при сохранении порядка:\n' + error.message);
         saveBtn.textContent = originalText;
         saveBtn.disabled = false;
     }
