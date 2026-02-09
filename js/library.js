@@ -173,6 +173,10 @@ function applyTracksFilters() {
     }
 
     filtered.sort((a, b) => {
+        if (sortBy === 'custom') {
+            // Пользовательский порядок - только по custom_order
+            return (b.custom_order || 0) - (a.custom_order || 0);
+        }
         if (sortBy === 'score-desc') {
             const scoreDiff = Math.round((b.total_score - a.total_score) * 100) / 100;
             return scoreDiff === 0 ? (b.custom_order || 0) - (a.custom_order || 0) : scoreDiff;
@@ -211,6 +215,10 @@ function applyAlbumsFilters() {
     filtered = filtered.map(a => ({ ...a, avgScore: getAlbumAvgScore(a) }));
 
     filtered.sort((a, b) => {
+        if (sortBy === 'custom') {
+            // Пользовательский порядок - только по custom_order
+            return (b.custom_order || 0) - (a.custom_order || 0);
+        }
         if (sortBy === 'score-desc') {
             // Сравниваем с точностью 2 знака после запятой
             const scoreDiff = Math.round((b.avgScore - a.avgScore) * 100) / 100;
@@ -249,6 +257,10 @@ function applyArtistsFilters() {
     });
 
     filtered.sort((a, b) => {
+        if (sortBy === 'custom') {
+            // Пользовательский порядок - только по custom_order
+            return (b.custom_order || 0) - (a.custom_order || 0);
+        }
         if (sortBy === 'score-desc') {
             const scoreDiff = Math.round((b.avgScore - a.avgScore) * 100) / 100;
             return scoreDiff === 0 ? (b.custom_order || 0) - (a.custom_order || 0) : scoreDiff;
@@ -577,13 +589,13 @@ async function saveOrder() {
         // Закрываем модаль
         document.getElementById('reorder-modal').classList.add('hidden');
         
-        // ВАЖНО: Переключаем сортировку на "Оценка ↓" чтобы custom_order был основным критерием
+        // ВАЖНО: Переключаем сортировку на "Мой порядок" чтобы custom_order был основным критерием
         if (reorderType === 'albums') {
-            document.getElementById('albums-sort-select').value = 'score-desc';
+            document.getElementById('albums-sort-select').value = 'custom';
         } else if (reorderType === 'tracks') {
-            document.getElementById('sort-select').value = 'score-desc';
+            document.getElementById('sort-select').value = 'custom';
         } else if (reorderType === 'artists') {
-            document.getElementById('artists-sort-select').value = 'score-desc';
+            document.getElementById('artists-sort-select').value = 'custom';
         }
         
         // Перезагружаем данные
