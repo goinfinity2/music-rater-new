@@ -19,13 +19,13 @@ async function loadData() {
     const session = await checkAuth();
     if (!session) return;
 
-    const { data: tracks } = await supabaseClient.from('tracks').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+    const { data: tracks } = await supabaseClient.from('tracks').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('created_at', { ascending: false });
     allTracks = tracks || [];
 
-    const { data: albums } = await supabaseClient.from('albums').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+    const { data: albums } = await supabaseClient.from('albums').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('created_at', { ascending: false });
     allAlbums = albums || [];
 
-    const { data: artists } = await supabaseClient.from('artists').select('*').eq('user_id', session.user.id).order('name');
+    const { data: artists } = await supabaseClient.from('artists').select('*').eq('user_id', session.user.id).order('custom_order', { ascending: false }).order('name');
     allArtists = artists || [];
 
     populateFilters();
@@ -426,22 +426,46 @@ async function saveOrder() {
         return;
     }
     
-    document.getElementById('reorder-modal').classList.add('hidden');
-    
-    // Сохраняем порядок: первый элемент имеет максимальный порядок
-    const updates = Array.from(items).map((item, index) => ({
-        id: item.dataset.id,
-        order: items.length - index
-    }));
+    const saveBtn = document.getElementById('save-order-btn');
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = 'Сохраняю...';
+    saveBtn.disabled = true;
     
     try {
+        // Сохраняем порядок для каждого элемента
+        const updates = Array.from(items).map((item, index) => ({
+            id: item.dataset.id,
+            order: items.length - index
+        }));
+        
+        console.log('Сохраняем порядок в таблицу:', reorderType, updates);
+        
+        // Сохраняем все обновления
         for (const update of updates) {
-            await supabaseClient.from(reorderType).update({ custom_order: update.order }).eq('id', update.id);
+            const { data, error } = await supabaseClient
+                .from(reorderType)
+                .update({ custom_order: update.order })
+                .eq('id', update.id)
+                .select();
+            
+            if (error) {
+                console.error(`Ошибка при сохранении ${update.id}:`, error);
+            } else {
+                console.log(`Сохранено ${update.id} с порядком ${update.order}:`, data);
+            }
         }
+        
+        // Закрываем модаль и перезагружаем данные
+        document.getElementById('reorder-modal').classList.add('hidden');
         await loadData();
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+        
     } catch (error) {
         console.error('Ошибка при сохранении порядка:', error);
-        alert('Ошибка при сохранении порядка');
+        alert('Ошибка при сохранении порядка: ' + error.message);
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
     }
 }
 
