@@ -577,6 +577,15 @@ async function saveOrder() {
         // Закрываем модаль
         document.getElementById('reorder-modal').classList.add('hidden');
         
+        // ВАЖНО: Переключаем сортировку на "Оценка ↓" чтобы custom_order был основным критерием
+        if (reorderType === 'albums') {
+            document.getElementById('albums-sort-select').value = 'score-desc';
+        } else if (reorderType === 'tracks') {
+            document.getElementById('sort-select').value = 'score-desc';
+        } else if (reorderType === 'artists') {
+            document.getElementById('artists-sort-select').value = 'score-desc';
+        }
+        
         // Перезагружаем данные
         await loadData();
         
