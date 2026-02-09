@@ -84,7 +84,6 @@ function renderArtist() {
     document.getElementById('page-title').textContent = artist.name;
     document.getElementById('add-album-btn').href = `add-album.html?artist=${artistId}`;
     document.getElementById('add-track-btn').href = `rate.html?artist=${artistId}`;
-    document.getElementById('edit-artist-btn').href = `edit-artist.html?id=${artistId}`;
 
     const cover = artist.image_url ? `<img src="${artist.image_url}" alt="">` : '';
     const avgScore = artistTracks.length > 0
@@ -400,6 +399,12 @@ document.getElementById('delete-artist-btn').addEventListener('click', async () 
 // Модалки
 document.getElementById('modal-close').addEventListener('click', () => {
     document.getElementById('modal').classList.add('hidden');
+});
+
+document.getElementById('stats-btn').addEventListener('click', openStatsModal);
+
+document.getElementById('edit-artist-btn').addEventListener('click', () => {
+    if (artistId) window.location.href = `edit-artist.html?id=${artistId}`;
 });
 
 document.getElementById('stats-modal-close').addEventListener('click', () => {
