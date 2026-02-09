@@ -304,27 +304,29 @@ function initDragAndDrop() {
             draggedItem = item;
             item.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', item.innerHTML);
-        });
-
-        item.addEventListener('dragend', (e) => {
-            item.classList.remove('dragging');
-            draggedItem = null;
         });
 
         item.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
+            
             if (draggedItem && draggedItem !== item) {
-                const rect = item.getBoundingClientRect();
-                const midpoint = rect.height / 2;
-                const offset = e.clientY - rect.top;
-                if (offset < midpoint) {
-                    item.parentNode.insertBefore(draggedItem, item);
-                } else {
+                const allItems = Array.from(list.querySelectorAll('.reorder-item'));
+                const draggedIndex = allItems.indexOf(draggedItem);
+                const targetIndex = allItems.indexOf(item);
+                
+                if (draggedIndex < targetIndex) {
                     item.parentNode.insertBefore(draggedItem, item.nextSibling);
+                } else {
+                    item.parentNode.insertBefore(draggedItem, item);
                 }
             }
+        });
+
+        item.addEventListener('dragend', (e) => {
+            item.classList.remove('dragging');
+            draggedItem = null;
+            updatePositions();
         });
 
         item.addEventListener('drop', (e) => {
@@ -333,65 +335,86 @@ function initDragAndDrop() {
         });
     });
 
-    // Обработчик для мобильных устройств (touchstart/touchmove/touchend)
-    list.querySelectorAll('.reorder-handle').forEach(handle => {
-        let touchItem = null;
-        let offsetY = 0;
+    // Мобильная поддержка
+    list.addEventListener('touchstart', (e) => {
+        const handle = e.target.closest('.reorder-handle');
+        if (!handle) return;
+        
+        draggedItem = handle.closest('.reorder-item');
+        if (draggedItem) {
+            draggedItem.classList.add('dragging');
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-        handle.addEventListener('touchstart', (e) => {
-            touchItem = handle.closest('.reorder-item');
-            if (!touchItem) return;
-            
-            const touch = e.touches[0];
-            const rect = touchItem.getBoundingClientRect();
-            offsetY = touch.clientY - rect.top;
-            touchItem.classList.add('dragging');
-        }, { passive: true });
-    });
-
-    // Touch move handling
     list.addEventListener('touchmove', (e) => {
-        const dragging = document.querySelector('.reorder-item.dragging');
-        if (!dragging) return;
-
+        if (!draggedItem) return;
+        e.preventDefault();
+        
         const touch = e.touches[0];
-        const rect = dragging.getBoundingClientRect();
-
-        list.querySelectorAll('.reorder-item').forEach(item => {
-            if (item === dragging) return;
-            const itemRect = item.getBoundingClientRect();
-            const midpoint = itemRect.height / 2;
-            const offset = touch.clientY - itemRect.top;
-
-            if (offset < midpoint && touch.clientY > itemRect.top && touch.clientY < itemRect.top + itemRect.height / 2) {
-                item.parentNode.insertBefore(dragging, item);
-            } else if (offset >= midpoint && touch.clientY > itemRect.top + itemRect.height / 2 && touch.clientY < itemRect.bottom) {
-                item.parentNode.insertBefore(dragging, item.nextSibling);
+        const allItems = Array.from(list.querySelectorAll('.reorder-item'));
+        
+        allItems.forEach(item => {
+            if (item === draggedItem) return;
+            
+            const rect = item.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            
+            if (touch.clientY < midpoint) {
+                item.parentNode.insertBefore(draggedItem, item);
+            } else {
+                item.parentNode.insertBefore(draggedItem, item.nextSibling);
             }
         });
-    }, { passive: true });
+    }, { passive: false });
 
     list.addEventListener('touchend', (e) => {
-        const dragging = document.querySelector('.reorder-item.dragging');
-        if (dragging) {
-            dragging.classList.remove('dragging');
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+            draggedItem = null;
             updatePositions();
         }
-    }, { passive: true });
+    }, { passive: false });
 }
 
 function updatePositions() {
-    document.querySelectorAll('.reorder-item').forEach((item, index) => { item.querySelector('.reorder-position').textContent = index + 1; item.dataset.index = index; });
+    const list = document.getElementById('reorder-list');
+    const items = list.querySelectorAll('.reorder-item');
+    items.forEach((item, index) => {
+        item.dataset.index = index;
+        const posElement = item.querySelector('.reorder-position');
+        if (posElement) {
+            posElement.textContent = index + 1;
+        }
+    });
 }
 
 async function saveOrder() {
-    const items = document.querySelectorAll('.reorder-item');
-    const maxOrder = items.length;
-    document.getElementById('reorder-modal').classList.add('hidden');
-    for (const item of items) {
-        await supabaseClient.from(reorderType).update({ custom_order: maxOrder - parseInt(item.dataset.index) }).eq('id', item.dataset.id);
+    const list = document.getElementById('reorder-list');
+    const items = list.querySelectorAll('.reorder-item');
+    
+    if (items.length === 0) {
+        document.getElementById('reorder-modal').classList.add('hidden');
+        return;
     }
-    loadData();
+    
+    document.getElementById('reorder-modal').classList.add('hidden');
+    
+    // Сохраняем порядок: первый элемент имеет максимальный порядок
+    const updates = Array.from(items).map((item, index) => ({
+        id: item.dataset.id,
+        order: items.length - index
+    }));
+    
+    try {
+        for (const update of updates) {
+            await supabaseClient.from(reorderType).update({ custom_order: update.order }).eq('id', update.id);
+        }
+        await loadData();
+    } catch (error) {
+        console.error('Ошибка при сохранении порядка:', error);
+        alert('Ошибка при сохранении порядка');
+    }
 }
 
 // EVENT LISTENERS
