@@ -540,56 +540,53 @@ async function saveOrder() {
         return;
     }
     
+    const session = await checkAuth();
+    if (!session) return;
+    
     const saveBtn = document.getElementById('save-order-btn');
     const originalText = saveBtn.textContent;
     saveBtn.textContent = 'Сохраняю...';
     saveBtn.disabled = true;
     
     try {
-        // Не закрываем модаль до завершения сохранения
-        
-        // Сохраняем порядок для каждого элемента
         const updates = Array.from(items).map((item, index) => ({
             id: item.dataset.id,
             order: items.length - index
         }));
         
-        console.log('Тип таблицы:', reorderType);
-        console.log('Элементы для сохранения:', updates);
-        
         let successCount = 0;
         let errorCount = 0;
         
-        // Сохраняем все обновления
+        // Сохраняем ВСЕ обновления
         for (const update of updates) {
-            console.log(`Обновляю ${reorderType}: id=${update.id}, custom_order=${update.order}`);
-            
-            const { error } = await supabaseClient
+            const { data, error, count } = await supabaseClient
                 .from(reorderType)
                 .update({ custom_order: update.order })
-                .eq('id', update.id);
+                .eq('id', update.id)
+                .eq('user_id', session.user.id)  // ВАЖНО: добавляем user_id
+                .select();  // ВАЖНО: запрашиваем данные обратно для проверки
             
             if (error) {
-                console.error(`❌ Ошибка при сохранении ${update.id}:`, error);
+                console.error(`❌ Ошибка ${update.id}:`, error);
+                errorCount++;
+            } else if (!data || data.length === 0) {
+                console.error(`❌ Не обновлено ${update.id} — строка не найдена (RLS?)`);
                 errorCount++;
             } else {
-                console.log(`✅ Успешно сохранено ${update.id} с порядком ${update.order}`);
                 successCount++;
             }
         }
         
-        console.log(`Результат: успешно ${successCount}, ошибок ${errorCount}`);
-        
-        if (errorCount > 0) {
-            alert(`Сохранено ${successCount} из ${updates.length}. Ошибок: ${errorCount}`);
-        } else {
-            alert('Порядок успешно сохранён!');
-        }
+        console.log(`Результат: ✅ ${successCount}, ❌ ${errorCount}`);
         
         // Закрываем модаль
         document.getElementById('reorder-modal').classList.add('hidden');
         
-        // ВАЖНО: Переключаем сортировку на "Мой порядок" чтобы custom_order был основным критерием
+        if (errorCount > 0) {
+            alert(`⚠️ Сохранено ${successCount} из ${updates.length}.\n\nЕсли ничего не сохранилось — проблема в настройках базы данных (RLS политики). Выполни SQL скрипт из инструкции.`);
+        }
+        
+        // Переключаем на "Мой порядок"
         if (reorderType === 'albums') {
             document.getElementById('albums-sort-select').value = 'custom';
         } else if (reorderType === 'tracks') {
@@ -601,12 +598,10 @@ async function saveOrder() {
         // Перезагружаем данные
         await loadData();
         
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
-        
     } catch (error) {
-        console.error('Критическая ошибка при сохранении порядка:', error);
-        alert('Критическая ошибка при сохранении порядка:\n' + error.message);
+        console.error('Критическая ошибка:', error);
+        alert('Ошибка: ' + error.message);
+    } finally {
         saveBtn.textContent = originalText;
         saveBtn.disabled = false;
     }
