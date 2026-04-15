@@ -81,6 +81,15 @@ function populateForm() {
         const preview = document.getElementById('image-preview');
         preview.innerHTML = `<img src="${track.image_url}" alt="">`;
         preview.classList.add('has-image');
+        
+        // Устанавливаем фон
+        const pageBg = document.getElementById('page-bg');
+        pageBg.style.backgroundImage = `url(${track.image_url})`;
+        pageBg.classList.add('active');
+        
+        // Устанавливаем маленькую обложку
+        const smallCover = document.getElementById('small-cover');
+        smallCover.src = track.image_url;
     }
 
     // Вокал
@@ -136,15 +145,10 @@ function calculateTotal() {
 }
 
 function getScoreColor(score) {
-    if (score >= 9.5) return '#00ff00';
-    if (score >= 8.5) return '#40ff00';
-    if (score >= 7.5) return '#80ff00';
-    if (score >= 6.5) return '#ffff00';
-    if (score >= 5.5) return '#ffcc00';
-    if (score >= 4.5) return '#ff9900';
-    if (score >= 3.5) return '#ff6600';
-    if (score >= 2.5) return '#ff3300';
-    return '#ff0000';
+    if (score >= 8) return '#22c55e';
+    if (score >= 7) return '#eab308';
+    if (score >= 5) return '#f97316';
+    return '#ef4444';
 }
 
 // Автодополнение артиста
@@ -209,9 +213,29 @@ document.getElementById('image-file').addEventListener('change', (e) => {
             const preview = document.getElementById('image-preview');
             preview.innerHTML = `<img src="${e.target.result}" alt="">`;
             preview.classList.add('has-image');
+            
+            // Обновляем фон и маленькую обложку
+            const pageBg = document.getElementById('page-bg');
+            pageBg.style.backgroundImage = `url(${e.target.result})`;
+            pageBg.classList.add('active');
+            
+            const smallCover = document.getElementById('small-cover');
+            smallCover.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
+});
+
+// Переключатель обложки
+let coverVisible = false;
+document.getElementById('toggle-cover-btn').addEventListener('click', () => {
+    coverVisible = !coverVisible;
+    const smallCover = document.getElementById('small-cover');
+    const btn = document.getElementById('toggle-cover-btn');
+    
+    smallCover.classList.toggle('active', coverVisible);
+    btn.classList.toggle('active', coverVisible);
+    btn.textContent = coverVisible ? 'Скрыть обложку' : 'Показать обложку';
 });
 
 async function uploadImage(file) {

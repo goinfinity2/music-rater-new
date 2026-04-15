@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="page-background" id="page-bg"></div>
     <div class="app-container">
         <header class="header">
             <a href="index.html" class="back-btn" id="back-btn">←</a>
@@ -38,6 +39,11 @@
                     </div>
                 </label>
                 <input type="file" id="image-file" accept="image/*" hidden>
+            </div>
+            
+            <div class="small-cover-container">
+                <img id="small-cover" class="small-cover" src="" alt="Обложка">
+                <button type="button" id="toggle-cover-btn" class="btn-toggle-cover">Показать обложку</button>
             </div>
 
             <div class="input-group">

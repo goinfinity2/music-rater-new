@@ -998,16 +998,16 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* ===== ЦВЕТА ОЦЕНОК ===== */
-.score-10 { color: #00ff00 !important; background: rgba(0, 255, 0, 0.15) !important; }
-.score-9 { color: #40ff00 !important; background: rgba(64, 255, 0, 0.15) !important; }
-.score-8 { color: #80ff00 !important; background: rgba(128, 255, 0, 0.15) !important; }
-.score-7 { color: #ffff00 !important; background: rgba(255, 255, 0, 0.15) !important; }
-.score-6 { color: #ffcc00 !important; background: rgba(255, 204, 0, 0.15) !important; }
-.score-5 { color: #ff9900 !important; background: rgba(255, 153, 0, 0.15) !important; }
-.score-4 { color: #ff6600 !important; background: rgba(255, 102, 0, 0.15) !important; }
-.score-3 { color: #ff3300 !important; background: rgba(255, 51, 0, 0.15) !important; }
-.score-2 { color: #ff0000 !important; background: rgba(255, 0, 0, 0.15) !important; }
-.score-1 { color: #cc0000 !important; background: rgba(204, 0, 0, 0.15) !important; }
+.score-10 { color: #22c55e !important; background: rgba(34, 197, 94, 0.2) !important; }
+.score-9 { color: #22c55e !important; background: rgba(34, 197, 94, 0.2) !important; }
+.score-8 { color: #22c55e !important; background: rgba(34, 197, 94, 0.2) !important; }
+.score-7 { color: #eab308 !important; background: rgba(234, 179, 8, 0.2) !important; }
+.score-6 { color: #f97316 !important; background: rgba(249, 115, 22, 0.2) !important; }
+.score-5 { color: #f97316 !important; background: rgba(249, 115, 22, 0.2) !important; }
+.score-4 { color: #ef4444 !important; background: rgba(239, 68, 68, 0.2) !important; }
+.score-3 { color: #ef4444 !important; background: rgba(239, 68, 68, 0.2) !important; }
+.score-2 { color: #ef4444 !important; background: rgba(239, 68, 68, 0.2) !important; }
+.score-1 { color: #ef4444 !important; background: rgba(239, 68, 68, 0.2) !important; }
 
 /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ===== */
 .modal-album {
@@ -1996,6 +1996,60 @@ textarea:focus {
     padding: 15px; /* Увеличим зону нажатия */
     margin: -15px;
     font-size: 24px;
+}
+
+/* ===== ФОН НА СТРАНИЦЕ РЕДАКТИРОВАНИЯ ===== */
+.page-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    filter: blur(30px) brightness(0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.page-background.active {
+    opacity: 1;
+}
+
+.small-cover-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.small-cover {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: none;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.small-cover.active {
+    display: block;
+}
+
+.btn-toggle-cover {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-toggle-cover.active {
+    background: var(--accent);
+    border-color: var(--accent);
 }
 /* ========================================= */
 /* НОВЫЕ СТИЛИ (ДОБАВЛЕНО ТОЛЬКО ЧТО)        */

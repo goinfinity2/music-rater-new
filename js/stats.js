@@ -157,15 +157,10 @@ function renderLevelCard() {
 }
 
 function getScoreColor(score) {
-    if (score >= 9.5) return '#00ff00';
-    if (score >= 8.5) return '#40ff00';
-    if (score >= 7.5) return '#80ff00';
-    if (score >= 6.5) return '#ffff00';
-    if (score >= 5.5) return '#ffcc00';
-    if (score >= 4.5) return '#ff9900';
-    if (score >= 3.5) return '#ff6600';
-    if (score >= 2.5) return '#ff3300';
-    return '#ff0000';
+    if (score >= 8) return '#22c55e';
+    if (score >= 7) return '#eab308';
+    if (score >= 5) return '#f97316';
+    return '#ef4444';
 }
 
 function getScoreClass(score) {
